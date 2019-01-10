@@ -81,6 +81,8 @@ class NNetwork:
         y_max = 800
         h = 10
         x,y=np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
-        return np.c_[x.ravel(), y.ravel()]
+        z= np.c_[x.ravel(), y.ravel()]
+        print(z)
+        return z
 
 
