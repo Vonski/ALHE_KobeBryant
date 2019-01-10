@@ -12,61 +12,75 @@ import seaborn as sns
 sns.set()
 plt.rcParams['figure.figsize'] = [7.5,14]
 
-# wczytaj dane i odrzuć wiersze, w których występuje NaN (nie ma shot_made_flag)
-data=pd.read_csv("../data/data.csv")
-print(data.shape)
-data.dropna(inplace=True)
-print(data.shape)
-print(data.columns)
+class NNetwork:
 
-X = data[["loc_x", "loc_y"]]
-y = data[["shot_made_flag"]]
-XX = np.array(X)
-yy = np.array(y)
-yy = to_categorical(yy)
-cnt_lr = 2000
-cnt_ud=1000
-additional_points_1 = np.concatenate((np.random.randint(-350, 350, (cnt_ud,1)), np.random.randint(-100, -50, (cnt_ud,1))), axis=1)
-additional_points_2 = np.concatenate((np.random.randint(-350, 350, (cnt_ud,1)), np.random.randint(750, 800, (cnt_ud,1))), axis=1)
-additional_points_3 = np.concatenate((np.random.randint(-350, -300, (cnt_lr,1)), np.random.randint(-50, 800, (cnt_lr,1))), axis=1)
-additional_points_4 = np.concatenate((np.random.randint(300, 350, (cnt_lr,1)), np.random.randint(-50, 800, (cnt_lr,1))), axis=1)
-additional_y = np.array([[1.0,0.0]]*(cnt_ud*2+cnt_lr*2))
+    def __init__(self,data="../data/data.csv"):
+        self.prepareData(data)
+        self.generateAdditionalPoints()
+        self.shuffleData()
+        self.buildModel()
 
-newX = np.concatenate((XX, additional_points_1, additional_points_2, additional_points_3, additional_points_4))
-newy = np.concatenate((yy, additional_y))
-p = np.random.permutation(len(newy))
-newX = newX[p]
-newy = newy[p]
+    def prepareData(self, data):
+        # wczytaj dane i odrzuć wiersze, w których występuje NaN (nie ma shot_made_flag)
+        data=pd.read_csv(data)
+        data.dropna(inplace=True)
+        X = data[["loc_x", "loc_y"]]
+        y = data[["shot_made_flag"]]
+        self.X = np.array(X)
+        self.Y = to_categorical(np.array(y))
 
-#model
-model = Sequential()
-model.add(Dense(100, input_dim=2, activation="relu"))#, kernel_regularizer=regularizers.l2(0.01)))
-model.add(Dense(100, input_dim=2, activation="relu"))#, kernel_regularizer=regularizers.l2(0.01)))
-model.add(Dense(2, activation="softmax"))
-model.compile(loss="binary_crossentropy", optimizer="Adam", metrics=["accuracy"])
+    def generateAdditionalPoints(self):
+        cnt_lr = 2000
+        cnt_ud=1000
+        additional_points_1 = np.concatenate((np.random.randint(-350, 350, (cnt_ud,1)), np.random.randint(-100, -50, (cnt_ud,1))), axis=1)
+        additional_points_2 = np.concatenate((np.random.randint(-350, 350, (cnt_ud,1)), np.random.randint(750, 800, (cnt_ud,1))), axis=1)
+        additional_points_3 = np.concatenate((np.random.randint(-350, -300, (cnt_lr,1)), np.random.randint(-50, 800, (cnt_lr,1))), axis=1)
+        additional_points_4 = np.concatenate((np.random.randint(300, 350, (cnt_lr,1)), np.random.randint(-50, 800, (cnt_lr,1))), axis=1)
+        additional_y = np.array([[1.0,0.0]]*(cnt_ud*2+cnt_lr*2))
+        self.X = np.concatenate((self.X, additional_points_1, additional_points_2, additional_points_3, additional_points_4))
+        self.Y = np.concatenate((self.Y, additional_y))
 
-model.fit(newX, newy, epochs=50, batch_size=32, validation_split=0.2, verbose=0)
+    def shuffleData(self):
+        p = np.random.permutation(len(self.Y))
+        self.X = self.X[p]
+        self.Y = self.Y[p]
 
-t = np.array(XX)
-print(t)
-print(t.shape)
-model.predict(t)
+    def buildModel(self):
+        self.model = Sequential()
+        self.model.add(Dense(100, input_dim=2, activation="relu"))#, kernel_regularizer=regularizers.l2(0.01)))
+        self.model.add(Dense(100, input_dim=2, activation="relu"))#, kernel_regularizer=regularizers.l2(0.01)))
+        self.model.add(Dense(2, activation="softmax"))
+        
+    def train(self):
+        self.model.compile(loss="binary_crossentropy", optimizer="Adam", metrics=["accuracy"])
+        self.model.fit(self.X, self.Y, epochs=10, batch_size=32, validation_split=0.2, verbose=0)
 
-def plot_decision_boundary(pred_func):
-    # Set min and max values and give it some padding
-    x_min = -300
-    x_max = 300
-    y_min = -100
-    y_max = 800
-    h = 10
-    # Generate a grid of points with distance h between them
-    xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
-    # Predict the function value for the whole gid
-    Z = pred_func(np.c_[xx.ravel(), yy.ravel()])
-    Z = Z[:,0].reshape(xx.shape)
-    # Plot the contour and training examples
-    plt.contourf(xx, yy, Z, 50, cmap=plt.cm.Spectral)
-    plt.show()
+    def predict(self, x):
+        return self.model.predict(np.array(x))
+
+    def plotBoundary(self,pred_func):
+        # Set min and max values and give it some padding
+        x_min = -300
+        x_max = 300
+        y_min = -100
+        y_max = 800
+        h = 10
+        # Generate a grid of points with distance h between them
+        xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
+        # Predict the function value for the whole gid
+        Z = pred_func(np.c_[xx.ravel(), yy.ravel()])
+        Z = Z[:,0].reshape(xx.shape)
+        # Plot the contour and training examples
+        plt.contourf(xx, yy, Z, 50, cmap=plt.cm.Spectral)
+        plt.show()
+
+    def generateMeshgrid(self):
+        x_min = -300
+        x_max = 300
+        y_min = -100
+        y_max = 800
+        h = 10
+        x,y=np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
+        return np.c_[x.ravel(), y.ravel()]
 
 
-plot_decision_boundary(model.predict)
