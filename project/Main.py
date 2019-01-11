@@ -1,12 +1,14 @@
 from NNetwork import NNetwork
 from StochasticHillClimbing import StochasticHillClimbing
+import numpy as np
 
 network=NNetwork()
 network.train()
 network.plotBoundary(network.predict)
 x=network.generateMeshgrid()
 y=network.predict(x)
-climber=StochasticHillClimbing(x,y)
+real_points=np.concatenate((network.X, network.Y), axis=1)
+climber=StochasticHillClimbing(x,y,real_points)
 z=climber.getCutPoints()
 print(z)
 print(z[300,50])
