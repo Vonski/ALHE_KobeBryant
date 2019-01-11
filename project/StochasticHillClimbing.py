@@ -71,4 +71,4 @@ class StochasticHillClimbing:
 				if len(marea)<len(carea):
 					marea=carea
 				found = False
-		return marea
+		return np.array(marea)
