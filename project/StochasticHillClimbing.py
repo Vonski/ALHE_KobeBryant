@@ -7,7 +7,7 @@ class StochasticHillClimbing:
 	def __init__(self, x, y, real_points):
 		self.z=1.0
 		self.z_tmp=1.0
-		self.min_accuracy=0.2
+		self.min_accuracy=0.55
 		self.max_x = 300
 		self.max_y = 800
 		self.min_x = -300
@@ -60,8 +60,8 @@ class StochasticHillClimbing:
 			return 0
 		points_to_avg=[]
 		for r in self.real_points:
-				if r[:2] in points[:,:2]:
-					points_to_avg.append(r)
+			if r[:2] in points[:,:2]:
+				points_to_avg.append(r)
 		if not points_to_avg:
 			return 0
 		return np.asarray(points_to_avg)[:,2].mean()
@@ -115,6 +115,6 @@ class StochasticHillClimbing:
 	def generateArea(self, points):
 		area=np.full((self.max_x-self.min_x, self.max_y-self.min_y), -1.0)
 		for p in points:
-				area[(int(p[0])-self.min_x),(int(p[1])-self.min_y)]=p[2]
+			area[(int(p[0])-self.min_x),(int(p[1])-self.min_y)]=p[2]
 		return area
 
