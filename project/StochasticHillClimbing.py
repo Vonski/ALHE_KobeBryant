@@ -12,7 +12,7 @@ class StochasticHillClimbing:
 		self.max_x = 300
 		self.max_y = 800
 		self.min_x = -300
-		self.min_y = -50
+		self.min_y = -100
 		self.data=np.concatenate((x,y), axis=1)
 		self.real_points=real_points
 
@@ -28,14 +28,14 @@ class StochasticHillClimbing:
 		cnt=0
 		best_cut_points=None
 		while True:
-			self.z_tmp=self.z-abs(normalvariate(mu=0.0, sigma=0.6))
+			self.z_tmp=self.z-abs(normalvariate(mu=0.0, sigma=0.05))
 			cut_points=self.getCutPoints()
 			points=self.getBiggestArea(cut_points)
 			rate_tmp=self.rateSolution(points)
 			print(self.z_tmp)
 			print()
-			plt.contourf( np.arange(-300, 300, 1), np.arange(-50, 800, 1), cut_points.T, 2, cmap=plt.cm.Spectral)
-			plt.show()
+			# plt.contourf( np.arange(-300, 300, 1), np.arange(-100, 800, 1), cut_points.T, 1, cmap=plt.cm.Spectral)
+			# plt.show()
 			if rate_tmp>best_rate:
 				best_rate=rate_tmp
 				self.z=self.z_tmp
@@ -43,12 +43,12 @@ class StochasticHillClimbing:
 				cnt=0
 			else:
 				cnt+=1
-			if cnt>1000:
+			if cnt>10:
 				break
 		print('Rate (area) =', best_rate)
 		print('Z =', self.z)
-		print('Mean =', points[:,2].mean())
-		return best_cut_points #self.generateArea(points)
+		print('Mean =', self.getBiggestArea(best_cut_points)[:,2].mean())
+		return self.generateArea(self.getBiggestArea(best_cut_points))
 
 	def rateSolution(self, points):
 		mean=self.getRealPointsMean(points)
@@ -62,13 +62,16 @@ class StochasticHillClimbing:
 		return len(points)
 
 	def getRealPointsMean(self,points):
-		points = np.array([[-1,-1,0], [-1,0,0], [-1,1,0], [0,-1,0], [0,0,0], [0,1,0], [1,-1,0], [1,0,0], [1,1,0]])
+		# points = np.array([[-1,-1,0], [-1,0,0], [-1,1,0], [0,-1,0], [0,0,0], [0,1,0], [1,-1,0], [1,0,0], [1,1,0]])
 		if points.size==0:
 			return 0
 		points_to_avg=[]
 		for r in self.real_points:
-			if r[:2] in points[:,:2]:
+			if (r[0] in points[:,0]) and (r[1] in points[:,1]):
 				points_to_avg.append(r)
+		# for p in points_to_avg:
+			# print(p)
+			# input()
 		if not points_to_avg:
 			return 0
 		return np.asarray(points_to_avg)[:,2].mean()

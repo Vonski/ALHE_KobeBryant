@@ -1,3 +1,6 @@
+import numpy as np
+import math
+
 def generateAvarageValuesTable(X, y, cx, cy):
     hitted = np.zeros((901,601))
     missed = np.zeros((901,601))
