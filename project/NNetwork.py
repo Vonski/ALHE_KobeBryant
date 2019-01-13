@@ -26,6 +26,8 @@ class NNetwork:
         data.dropna(inplace=True)
         X = data[["loc_x", "loc_y"]]
         y = data[["shot_made_flag"]]
+        self.x_data=np.array(X)
+        self.y_data=np.array(y)
         self.X = np.array(X)
         self.Y = to_categorical(np.array(y))
 
@@ -53,7 +55,7 @@ class NNetwork:
         
     def train(self):
         self.model.compile(loss="binary_crossentropy", optimizer="Adam", metrics=["accuracy"])
-        self.model.fit(self.X, self.Y, epochs=10, batch_size=32, validation_split=0.2, verbose=0)
+        self.model.fit(self.X, self.Y, epochs=50, batch_size=32, validation_split=0.2, verbose=0)
 
     def predict(self, x):
         return self.model.predict(np.array(x))
@@ -64,7 +66,7 @@ class NNetwork:
         x_max = 300
         y_min = -100
         y_max = 800
-        h = 10
+        h = 1
         # Generate a grid of points with distance h between them
         xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
         # Predict the function value for the whole gid
@@ -79,7 +81,7 @@ class NNetwork:
         x_max = 300
         y_min = -100
         y_max = 800
-        h = 10
+        h = 1
         x,y=np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
         z= np.c_[x.ravel(), y.ravel()]
         print(z)

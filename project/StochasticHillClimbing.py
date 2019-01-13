@@ -1,75 +1,70 @@
 import numpy as np
-from random import normal
+from random import normalvariate
 import collections
 
 class StochasticHillClimbing:
 
-    def __init__(self, x, y, real_points):
-        self.z=0.0
-        self.min_accuracy=0.7
-        self.max_x = 300
-        self.max_y = 800
-        self.min_x = -300
-        self.min_y = -50
-        self.data=np.concatenate((x,y), axis=1)
-        self.real_points=real_points
+	def __init__(self, x, y, real_points):
+		self.z=1.0
+		self.z_tmp=1.0
+		self.min_accuracy=0.2
+		self.max_x = 300
+		self.max_y = 800
+		self.min_x = -300
+		self.min_y = -50
+		self.data=np.concatenate((x,y), axis=1)
+		self.real_points=real_points
 
 	def getCutPoints(self):
 		cut_points=np.full((self.max_x-self.min_x, self.max_y-self.min_y), -1.0)
 		for p in self.data:
-			if p[2]>=self.z:
+			if p[2]>=self.z_tmp:
 				cut_points[(int(p[0])-self.min_x),(int(p[1])-self.min_y)]=p[2]
 		return cut_points
 
-    def climb(self):
-        z_tmp=0.0
-        best_rate=0.0
-        cnt=0
-        while True:
-            self.z_temp=abs(normal(scale=0.1))+self.z
-            points=###
-            rate_tmp=self.rateSolution(points)
-            if rate_temp>best_rate:
-                best_rate=rate_tmp
-                self.z=z.tmp
-                cnt=0
-            else:
-                cnt+=1
-            if cnt>100:
-                break
-        return points 
+	def climb(self):
+		best_rate=0.0
+		cnt=0
+		best_cut_points=None
+		while True:
+			self.z_tmp=self.z-abs(normalvariate(mu=0.0, sigma=0.1))
+			cut_points=self.getCutPoints()
+			points=self.getBiggestArea(cut_points)
+			rate_tmp=self.rateSolution(points)
+			if rate_tmp>best_rate:
+				best_rate=rate_tmp
+				self.z=self.z_tmp
+				best_cut_points=cut_points
+				cnt=0
+			else:
+				cnt+=1
+			if cnt>1000:
+				break
+		print('Rate (area) =', best_rate)
+		print('Z =', self.z)
+		print('Mean =', points[:,2].mean())
+		return best_cut_points #self.generateArea(points)
 
-    def rateSolution(self, points):
-        if self.getRealPointsMean(points)<self.min_accuracy:
-            return 0
-        else:
-            return self.getArea(points)
-    
-    def getArea(self, points):
-        return len(points)
+	def rateSolution(self, points):
+		mean=self.getRealPointsMean(points)
+		if mean<self.min_accuracy:
+			return 0
+		else:
+			return self.getArea(points)
 
-    def getRealPointsMean(self,points):
-        points_to_avg=np.array()
-        for p in points:
-            for r in self.real_points:
-                if p[0]]==r[0] and p[1]==r[1]:
-                points_to_avg.append[r]
-        return points_to_avg[:,2].mean()
+	def getArea(self, points):
+		return len(points)
 
-	def updateQ(self, q, current, c):
-		if (current[0]-1,current[1]) in c:
-			q.append((current[0]-1,current[1]))
-			c.remove((current[0]-1,current[1]))
-		if (current[0]+1,current[1]) in c:
-			q.append((current[0]+1,current[1]))
-			c.remove((current[0]+1,current[1]))
-		if (current[0],current[1]-1) in c:
-			q.append((current[0],current[1]-1))
-			c.remove((current[0],current[1]-1))
-		if (current[0],current[1]+1) in c:
-			q.append((current[0],current[1]+1))
-			c.remove((current[0],current[1]+1))
-		return q, c
+	def getRealPointsMean(self,points):
+		if points.size==0:
+			return 0
+		points_to_avg=[]
+		for r in self.real_points:
+				if r[:2] in points[:,:2]:
+					points_to_avg.append(r)
+		if not points_to_avg:
+			return 0
+		return np.asarray(points_to_avg)[:,2].mean()
 
 	def getBiggestArea(self, z):
 		found = True
@@ -96,4 +91,30 @@ class StochasticHillClimbing:
 				if len(marea)<len(carea):
 					marea=carea
 				found = False
-		return np.array(marea)
+		marea=np.array(marea)
+		if marea.size==0:
+			return marea
+		bias=np.full((len(marea),3), [self.min_x, self.min_y, 0.0])
+		return np.add(marea,bias)
+
+	def updateQ(self, q, current, c):
+		if (current[0]-1,current[1]) in c:
+			q.append((current[0]-1,current[1]))
+			c.remove((current[0]-1,current[1]))
+		if (current[0]+1,current[1]) in c:
+			q.append((current[0]+1,current[1]))
+			c.remove((current[0]+1,current[1]))
+		if (current[0],current[1]-1) in c:
+			q.append((current[0],current[1]-1))
+			c.remove((current[0],current[1]-1))
+		if (current[0],current[1]+1) in c:
+			q.append((current[0],current[1]+1))
+			c.remove((current[0],current[1]+1))
+		return q, c
+
+	def generateArea(self, points):
+		area=np.full((self.max_x-self.min_x, self.max_y-self.min_y), -1.0)
+		for p in points:
+				area[(int(p[0])-self.min_x),(int(p[1])-self.min_y)]=p[2]
+		return area
+
