@@ -1,13 +1,14 @@
 import numpy as np
 from random import normalvariate
 import collections
+import matplotlib.pyplot as plt
 
 class StochasticHillClimbing:
 
 	def __init__(self, x, y, real_points):
 		self.z=1.0
 		self.z_tmp=1.0
-		self.min_accuracy=0.2
+		self.min_accuracy=0.55
 		self.max_x = 300
 		self.max_y = 800
 		self.min_x = -300
@@ -27,10 +28,14 @@ class StochasticHillClimbing:
 		cnt=0
 		best_cut_points=None
 		while True:
-			self.z_tmp=self.z-abs(normalvariate(mu=0.0, sigma=0.1))
+			self.z_tmp=self.z-abs(normalvariate(mu=0.0, sigma=0.6))
 			cut_points=self.getCutPoints()
 			points=self.getBiggestArea(cut_points)
 			rate_tmp=self.rateSolution(points)
+			print(self.z_tmp)
+			print()
+			plt.contourf( np.arange(-300, 300, 1), np.arange(-50, 800, 1), cut_points.T, 2, cmap=plt.cm.Spectral)
+			plt.show()
 			if rate_tmp>best_rate:
 				best_rate=rate_tmp
 				self.z=self.z_tmp
@@ -47,6 +52,7 @@ class StochasticHillClimbing:
 
 	def rateSolution(self, points):
 		mean=self.getRealPointsMean(points)
+		print(mean)
 		if mean<self.min_accuracy:
 			return 0
 		else:
@@ -56,12 +62,13 @@ class StochasticHillClimbing:
 		return len(points)
 
 	def getRealPointsMean(self,points):
+		points = np.array([[-1,-1,0], [-1,0,0], [-1,1,0], [0,-1,0], [0,0,0], [0,1,0], [1,-1,0], [1,0,0], [1,1,0]])
 		if points.size==0:
 			return 0
 		points_to_avg=[]
 		for r in self.real_points:
-				if r[:2] in points[:,:2]:
-					points_to_avg.append(r)
+			if r[:2] in points[:,:2]:
+				points_to_avg.append(r)
 		if not points_to_avg:
 			return 0
 		return np.asarray(points_to_avg)[:,2].mean()

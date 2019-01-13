@@ -73,7 +73,8 @@ class NNetwork:
         Z = pred_func(np.c_[xx.ravel(), yy.ravel()])
         Z = Z[:,0].reshape(xx.shape)
         # Plot the contour and training examples
-        plt.contourf(xx, yy, Z, 50, cmap=plt.cm.Spectral)
+        cs = plt.contourf(xx, yy, Z, 50, cmap=plt.cm.Spectral)
+        plt.colorbar(cs)
         plt.show()
 
     def generateMeshgrid(self):
