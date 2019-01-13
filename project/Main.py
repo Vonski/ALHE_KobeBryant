@@ -2,14 +2,30 @@ from NNetwork import NNetwork
 from StochasticHillClimbing import StochasticHillClimbing
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 network=NNetwork()
+
+#########################
+# z trenowaniem sieci
+#########################
 network.train()
-#network.plotBoundary(network.predict)
+network.plotBoundary(network.predict)
 x=network.generateMeshgrid()
 y=network.predict(x)[:,1]
 y=np.reshape(y,(len(y),1))
-print(max(y))
+y_df=pd.DataFrame(y)
+y_df.to_csv('y.txt')
+
+#########################
+# bez trenowania sieci
+#########################
+# x=network.generateMeshgrid()
+# y_df=pd.read_csv('y.txt')
+# y=np.array(y_df)[:,1]
+# y=y.reshape((len(y),1))
+
+#########################
 real_points=np.concatenate((network.x_data, network.y_data), axis=1)
 climber=StochasticHillClimbing(x,y,real_points)
 points=climber.climb()

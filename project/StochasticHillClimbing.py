@@ -122,6 +122,6 @@ class StochasticHillClimbing:
 	def generateArea(self, points):
 		area=np.full((self.max_x-self.min_x, self.max_y-self.min_y), -1.0)
 		for p in points:
-				area[(int(p[0])-self.min_x),(int(p[1])-self.min_y)]=p[2]
+			area[(int(p[0])-self.min_x),(int(p[1])-self.min_y)]=p[2]
 		return area
 
