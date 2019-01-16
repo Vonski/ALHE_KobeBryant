@@ -50,12 +50,19 @@ class NNetwork:
     def buildModel(self):
         self.model = Sequential()
         self.model.add(Dense(100, input_dim=2, activation="relu"))#, kernel_regularizer=regularizers.l2(0.01)))
-        self.model.add(Dense(100, input_dim=2, activation="relu"))#, kernel_regularizer=regularizers.l2(0.01)))
+        self.model.add(Dense(100, activation="relu"))#, kernel_regularizer=regularizers.l2(0.01)))
         self.model.add(Dense(2, activation="softmax"))
         
     def train(self):
         self.model.compile(loss="binary_crossentropy", optimizer="Adam", metrics=["accuracy"])
-        self.model.fit(self.X, self.Y, epochs=50, batch_size=32, validation_split=0.2, verbose=0)
+        for i in range(1):
+            self.model.fit(self.X, self.Y, epochs=50, batch_size=32, validation_split=0.2, verbose=0)
+            # #serialize model to JSON
+            # model_json = self.model.to_json()
+            # with open("model" +str(i)+".json", "w") as json_file:
+                # json_file.write(model_json)
+            # # serialize weights to HDF5
+            # self.model.save_weights("model" + str(i)+".h5")
 
     def predict(self, x):
         return self.model.predict(np.array(x))

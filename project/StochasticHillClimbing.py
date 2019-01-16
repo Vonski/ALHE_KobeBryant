@@ -47,7 +47,7 @@ class StochasticHillClimbing:
 				break
 		print('Rate (area) =', best_rate)
 		print('Z =', self.z)
-		print('Mean =', self.getBiggestArea(best_cut_points)[:,2].mean())
+		print('Mean =', self.getRealPointsMean(self.getBiggestArea(best_cut_points)))
 		return self.generateArea(self.getBiggestArea(best_cut_points))
 
 	def rateSolution(self, points):

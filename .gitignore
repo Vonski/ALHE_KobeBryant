@@ -105,3 +105,4 @@ venv.bak/
 
 # custom ignores
 /localenv/*
+*model*
