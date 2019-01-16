@@ -34,8 +34,6 @@ class StochasticHillClimbing:
 			rate_tmp=self.rateSolution(points)
 			print(self.z_tmp)
 			print()
-			# plt.contourf( np.arange(-300, 300, 1), np.arange(-100, 800, 1), cut_points.T, 1, cmap=plt.cm.Spectral)
-			# plt.show()
 			if rate_tmp>best_rate:
 				best_rate=rate_tmp
 				self.z=self.z_tmp
@@ -62,16 +60,12 @@ class StochasticHillClimbing:
 		return len(points)
 
 	def getRealPointsMean(self,points):
-		# points = np.array([[-1,-1,0], [-1,0,0], [-1,1,0], [0,-1,0], [0,0,0], [0,1,0], [1,-1,0], [1,0,0], [1,1,0]])
 		if points.size==0:
 			return 0
 		points_to_avg=[]
 		for r in self.real_points:
 			if (r[0] in points[:,0]) and (r[1] in points[:,1]):
 				points_to_avg.append(r)
-		# for p in points_to_avg:
-			# print(p)
-			# input()
 		if not points_to_avg:
 			return 0
 		return np.asarray(points_to_avg)[:,2].mean()

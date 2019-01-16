@@ -32,6 +32,7 @@ class NNetwork:
         self.Y = to_categorical(np.array(y))
 
     def generateAdditionalPoints(self):
+		# wygeneruj nietrafione punkty poza granicami boiska
         cnt_lr = 2000
         cnt_ud=1000
         additional_points_1 = np.concatenate((np.random.randint(-350, 350, (cnt_ud,1)), np.random.randint(-100, -50, (cnt_ud,1))), axis=1)

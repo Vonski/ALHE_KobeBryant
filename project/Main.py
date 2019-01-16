@@ -10,9 +10,9 @@ from keras.models import model_from_json
 
 network=NNetwork()
 
-cx1 = 141
-cy1 = 200
-md1 = mod.generateAvarageValuesTable(network.x_data, network.y_data,cx1,cy1)
+# cx1 = 141
+# cy1 = 200
+# md1 = mod.generateAvarageValuesTable(network.x_data, network.y_data,cx1,cy1)
 
 # cx2 = 65
 # cy2 = 100
@@ -61,9 +61,9 @@ y_df.to_csv('y.txt')
 # y=network.predict(x)[:,1]
 # y=np.reshape(y,(len(y),1))
 
-for iy in range(900):
-	for ix in range(600):
-		y[iy*600+ix,0] *= md1[math.floor(ix/(600/cx1)),math.floor(iy/(900/cy1))]
+# for iy in range(900):
+	# for ix in range(600):
+		# y[iy*600+ix,0] *= md1[math.floor(ix/(600/cx1)),math.floor(iy/(900/cy1))]
 		# y[iy*600+ix,0] *= md2[math.floor(ix/(600/cx2)),math.floor(iy/(900/cy2))]
 		# y[iy*600+ix,0] *= md3[math.floor(ix/(600/cx3)),math.floor(iy/(900/cy3))]
 		# y[iy*600+ix,0] *= md4[math.floor(ix/(600/cx4)),math.floor(iy/(900/cy4))]
@@ -71,15 +71,10 @@ for iy in range(900):
 # cs = plt.contourf( np.arange(-300, 300, 1),np.arange(-100, 800, 1), y.reshape((900,600)), 50, cmap=plt.cm.Spectral)
 # plt.colorbar(cs)
 # plt.show()
-
 #########################
+
 real_points=np.concatenate((network.x_data, network.y_data), axis=1)
 climber=StochasticHillClimbing(x,y,real_points)
 points=climber.climb()
-print(points)
-print(points.shape)
-#z=np.reshape(points[:,2],(len(points),1))
-#plt.scatter(points[:,0], points[:,1])
-print(len(np.arange(-300,300)))
 plt.contourf( np.arange(-300, 300, 1), np.arange(-100, 800, 1), points.T, 0, cmap=plt.cm.Spectral)
 plt.show()
